@@ -120,9 +120,6 @@
       '<div class="project-media"><img src="' + p.image + '" alt="' + p.title + '" loading="lazy"></div>' +
       '<div class="project-body">' +
       "<h3>" + p.title + "</h3>" +
-      '<div class="project-subtitle">' + p.subtitle + "</div>" +
-      "<p>" + p.blurb + "</p>" +
-      tagList(p.topics) +
       linkRow(p.links) +
       "</div></article>"
     );

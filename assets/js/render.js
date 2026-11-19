@@ -317,16 +317,71 @@
     return person.note ? '<div class="person-note">' + person.note + "</div>" : "";
   }
 
-  function personCard(person) {
+  /* Every card has a "Read bio" button. Its hit area stretches over the whole
+     card (see .person-bio-btn in style.css), so clicking the photo or name
+     opens the pop-up too. `index` is the person's place in PEOPLE.members. */
+  function personCard(person, index) {
     return (
       '<div class="person">' +
       '<img class="person-photo" src="' + person.photo + '" alt="' + person.name + '" loading="lazy">' +
       "<h3>" + person.name + "</h3>" +
       '<div class="person-role">' + person.role + "</div>" +
       personNote(person) +
+      '<button class="person-bio-btn" type="button" data-person="' + index +
+      '" aria-label="Read bio: ' + person.name + '">Read bio</button>' +
       personLinks(person) +
       "</div>"
     );
+  }
+
+  /* One shared <dialog> shows whichever bio was asked for. Returns the
+     function that fills and opens it. */
+  function bioDialog(members) {
+    const dialog = document.createElement("dialog");
+    dialog.className = "person-dialog";
+    dialog.setAttribute("aria-labelledby", "person-dialog-name");
+    document.body.appendChild(dialog);
+
+    let opener = null;
+    let pressedBackdrop = false;
+
+    /* The body fills the dialog, so only the dimmed backdrop targets the
+       dialog itself. The press must start there too, so dragging a text
+       selection out of the dialog does not close it. */
+    dialog.addEventListener("pointerdown", function (event) {
+      pressedBackdrop = event.target === dialog;
+    });
+
+    dialog.addEventListener("click", function (event) {
+      if ((pressedBackdrop && event.target === dialog) || event.target.closest(".person-dialog-close")) {
+        dialog.close();
+      }
+    });
+
+    dialog.addEventListener("close", function () {
+      if (opener) opener.focus();
+    });
+
+    /* The name takes focus on opening (autofocus), so screen readers start
+       at the top of the text; the close button comes last in tab order.
+       Someone without a bio yet gets the pop-up with no bio paragraph. */
+    return function open(index, button) {
+      const p = members[index];
+      opener = button;
+      dialog.innerHTML =
+        '<div class="person-dialog-body">' +
+        '<img class="person-photo" src="' + p.photo + '" alt="">' +
+        "<div>" +
+        '<h2 id="person-dialog-name" tabindex="-1" autofocus>' + p.name + "</h2>" +
+        '<div class="person-role">' + p.role + "</div>" +
+        personNote(p) +
+        (p.bio ? '<p class="person-bio">' + p.bio + "</p>" : "") +
+        personLinks(p) +
+        "</div>" +
+        '<button class="icon-btn person-dialog-close" type="button" aria-label="Close">' + icon("close") + "</button>" +
+        "</div>";
+      dialog.showModal();
+    };
   }
 
   function renderPeople() {
@@ -369,11 +424,25 @@
           return (
             '<section class="people-group">' +
             '<h2 class="group-title">' + g.title + "</h2>" +
-            '<div class="grid grid-4">' + members.map(personCard).join("") + "</div>" +
+            '<div class="grid grid-4">' +
+            members
+              .map(function (m) {
+                return personCard(m, data.members.indexOf(m));
+              })
+              .join("") +
+            "</div>" +
             "</section>"
           );
         })
         .join("");
+
+      if (groupsHost.querySelector(".person-bio-btn")) {
+        const openBio = bioDialog(data.members);
+        groupsHost.addEventListener("click", function (event) {
+          const button = event.target.closest(".person-bio-btn");
+          if (button) openBio(Number(button.dataset.person), button);
+        });
+      }
     }
 
     if (alumniHost) {

@@ -11,3 +11,6 @@ desktop.ini
 # Local tooling
 node_modules/
 .cache/
+
+# Full-size photos the web copies were cut from; kept locally, never published
+assets/img/originals/

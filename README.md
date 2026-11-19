@@ -75,8 +75,14 @@ automatically, and the **Alumni** section disappears until you add someone to th
 An optional `note` shows as a small line under the role, e.g.
 `note: "Advised by Prof. Leandros Tassiulas"`.
 
-Drop a square photo into `assets/img/people/` and point `photo` at it. 600×600 px or larger looks
-best; the site crops it to a circle.
+`bio` is optional too. The PI's bio is printed on the page. Everyone else's card has a **Read bio**
+button that opens a pop-up with their photo, links and bio; while `bio` is `""`, the pop-up simply
+has no bio text.
+
+For the photo, crop a square around the face, save it as a JPEG of about 600×600 px in
+`assets/img/people/` (a lowercase name like `jane-doe.jpg`), and point `photo` at it. The site shows
+it in a circle. Shrink photos straight off a phone or camera first: each file should be well under
+200 KB, or the People page gets slow to load.
 
 ### Add a news item
 
@@ -88,8 +94,9 @@ when the list grows too long.
 
 Add an entry to `data/projects.js` and set `direction` to the `id` of a research direction in
 `data/research.js` (`rf-perception`, `multimodal-sensing`, `robotics`, or `hri`); the project then
-appears under that direction on the research page. Project images are 16:9; replace the placeholder
-SVGs in `assets/img/projects/` with real photos or figures.
+appears under that direction on the research page. Save its image in `assets/img/projects/`, named
+after the project's `id` (e.g. `mmnorm.jpg`): 16:9, about 1200×675 px and well under 200 KB. The card
+crops anything that isn't 16:9, so crop a taller figure down to its most telling part first.
 
 ---
 
@@ -117,7 +124,8 @@ array in `data/site.js`, so navigation only has to be edited in one place.
 
 - [ ] **Have the PI check the publication list.** `data/publications.js` was compiled from her Google
       Scholar profile and website (mostly papers where she is first or second author).
-- [ ] Replace the placeholder art in `assets/img/` — lab photo, member photos, project figures.
+- [ ] Replace the remaining placeholder art: photos for the members still on
+      `assets/img/people/placeholder.svg`.
 - [ ] `data/site.js` also keeps a `sponsors` list that no page shows at the moment. To display it, add
       `<div class="sponsor-row" id="sponsors"></div>` to a page, and confirm any logos are used with
       permission.
